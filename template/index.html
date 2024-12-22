@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dự đoán bệnh tiểu đường</title>
+     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> 
+    <style>
+        /* Ẩn các vùng theo mặc định */
+        .section {
+            display: none;
+        }
+
+        /* Hiện vùng được chọn */
+        .active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header">
+        <nav>
+            <a href="#" onclick="showSection('home')">Trang chủ</a>
+            <a href="#" onclick="showSection('predict')">Dự đoán</a>
+            <a href="#" onclick="showSection('contact')">Thông tin liên hệ</a>
+        </nav>
+        <img src="{{ url_for('static', filename='images/banner.jpg') }}" alt="Banner">
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Nội dung chính -->
+        <div id="home" class="content section active">
+            <h2>Trang chủ</h2>
+            <p>Chào mừng bạn đến với ứng dụng dự đoán bệnh tiểu đường giai đoạn đầu.</p>
+            <img src="{{ url_for('static', filename='images/banner_home.jpg') }}" alt="Banner">
+        </div>
+
+        <div id="predict" class="content section">
+            <h2>Dự đoán bệnh tiểu đường</h2>
+            <form action="/predict" method="POST" id="predict-form">
+                <input type="hidden" id="selected-model" name="model">
+                <fieldset>
+                    <legend>Thông tin cá nhân</legend>
+
+                    <div class="form-group"> <label for="Age">Age:</label>
+                        <input type="number" id="age" name="Age" min="1" max="120" required value="{{ form_data.get('Age', '') }}">
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="Gender">Gender:</label>
+                        <select id="gender" name="Gender" required>
+                            <option value="male" {% if form_data.get('Gender') == 'male' %} selected{% endif %}>Male</option>
+                            <option value="female" {% if form_data.get('Gender') == 'female' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group"> <label for="Polyuria">Polyuria:</label>
+                        <select id="polyuria" name="Polyuria" required>
+                            <option value="yes" {% if form_data.get('Polyuria') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('Polyuria') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+
+                    <div class="form-group"> <label for="Polydipsia">Polydipsia:</label>
+                        <select id="polydipsia" name="Polydipsia" required>
+                            <option value="yes" {% if form_data.get('Polydipsia') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('Polydipsia') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="chsudden_weight_loss">Sudden Weight Loss:</label>
+                        <select id="weight_loss" name="chsudden_weight_loss" required>
+                            <option value="yes" {% if form_data.get('chsudden_weight_loss') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('chsudden_weight_loss') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weakness">Weakness:</label>
+                        <select id="weakness" name="weakness" required>
+                            <option value="yes" {% if form_data.get('weakness') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('weakness') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Polyphagia">Polyphagia:</label>
+                        <select id="polyphagia" name="Polyphagia" required>
+                            <option value="yes" {% if form_data.get('Polyphagia') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('Polyphagia') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group"> <label for="Genital_thrush">Genital Thrush:</label>
+                        <select id="genital_thrush" name="Genital_thrush" required>
+                            <option value="yes" {% if form_data.get('Genital_thrush') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('Genital_thrush') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+
+
+                    <div class="form-group">
+                        <label for="Visual_blurring">Visual Blurring:</label>
+                        <select id="visual_blurring" name="Visual_blurring" required>
+                            <option value="yes" {% if form_data.get('Visual_blurring') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('Visual_blurring') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group"> <label for="Itching">Itching:</label>
+                        <select id="itching" name="Itching" required>
+                            <option value="yes" {% if form_data.get('Itching') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('Itching') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group"> <label for="Irritability">Irritability:</label>
+                        <select id="irritability" name="Irritability" required>
+                            <option value="yes" {% if form_data.get('Irritability') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('Irritability') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="delayed_healing">Delayed Healing:</label>
+                        <select id="delayed_healing" name="delayed_healing" required>
+                            <option value="yes" {% if form_data.get('delayed_healing') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('delayed_healing') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group"> <label for="partial_paresis">Partial Paresis:</label>
+                        <select id="partial_paresis" name="partial_paresis" required>
+                            <option value="yes" {% if form_data.get('partial_paresis') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('partial_paresis') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group"> <label for="muscle_stiffness">Muscle Stiffness:</label>
+                        <select id="muscle_stiffness" name="muscle_stiffness" required>
+                            <option value="yes" {% if form_data.get('muscle_stiffness') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('muscle_stiffness') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group"> <label for="Alopecia">Alopecia:</label>
+                        <select id="alopecia" name="Alopecia" required>
+                            <option value="yes" {% if form_data.get('Alopecia') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('Alopecia') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group"> <label for="Obesity">Obesity:</label>
+                        <select id="obesity" name="Obesity" required>
+                            <option value="yes" {% if form_data.get('Obesity') == 'yes' %}selected{% endif %}>Yes</option>
+                            <option value="no" {% if form_data.get('Obesity') == 'no' %}selected{% endif %}>No</option>
+                        </select>
+                    </div>
+
+
+                    <!-- <button type="submit">Dự đoán</button> -->
+                    <button type="button" onclick="openModal()">Dự đoán</button>
+
+                </fieldset>
+            </form>
+        </div>
+
+        <div id="contact" class="content section">
+            <h2>Thông tin liên hệ</h2>
+            <p>Email: psymint002@example.com</p>
+            <p>Hotline: 0123 456 789</p>
+        </div>
+
+       <!-- bảng nhỏ hiển thị khi "dự đoán" -->
+
+        <div id="algorithm-modal" class="modal">
+            <div class="modal-content">
+                <p>Chọn một giải thuật để dự đoán:</p>
+                <button onclick="selectAlgorithm('Decisiontree')">Cây quyết định</button>
+                <button onclick="selectAlgorithm('Logistic_regression')">Hồi quy tuyến tính</button>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+        </div> 
+
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <h3>Navigation</h3>
+            <ul>
+                <li><a href="#" onclick="showSection('predict')">Dự đoán</a></li>
+                <li><a href="#" onclick="showSection('contact')">Thông tin liên hệ</a></li>
+            </ul>
+            <div>Kết quả: </div>
+            {% if prediction_text %}
+            <div class="box {{ class_text }}"> 
+                {% if prediction_text %}
+                    <h2 style="font-size: 17px;">{{ prediction_text }}</h2>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="box"> 
+                {% if prediction_text %}
+                    <h2 style="font-size: 17px;"> Chưa có kết quả dự đoán!</h2>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    
+    
+    <script>
+        function showSection(sectionId) {
+            // Ẩn tất cả các vùng
+            var sections = document.querySelectorAll('.section');
+            sections.forEach(function (section) {
+                section.classList.remove('active');
+            });
+        
+            // Hiển thị vùng được chọn
+            document.getElementById(sectionId).classList.add('active');
+        
+            // Xóa kết quả dự đoán nếu về trang chủ
+            if (sectionId === 'home') {
+                const resultBox = document.querySelector('.box');
+                if (resultBox) {
+                    resultBox.innerHTML = ''; // Xóa nội dung kết quả dự đoán
+                }
+            }
+        }
+    </script>
+
+    <script>
+        // Hàm mở modal
+        function openModal() {
+            document.getElementById("algorithm-modal").style.display = "block";
+        }
+
+        // Hàm đóng modal
+        function closeModal() {
+            document.getElementById("algorithm-modal").style.display = "none";
+        }
+
+        // Hàm chọn giải thuật
+        function selectAlgorithm(algorithm) {
+            // Gán giá trị mô hình vào hidden input
+            document.getElementById('selected-model').value = algorithm;
+        
+            // Hiển thị thông báo (tuỳ chọn)
+            alert("Bạn đã chọn thuật toán: " + algorithm);
+            
+            const model = document.getElementById('selected-model').value;
+            if (!model) {
+                alert("Vui lòng chọn mô hình trước khi dự đoán!");
+                return;
+            }
+        
+            // Gửi form dự đoán
+            document.getElementById('predict-form').submit();
+
+            // Đóng modal
+            closeModal();
+        }
+
+        function submitPrediction() {
+            // Kiểm tra xem mô hình đã được chọn chưa
+            const model = document.getElementById('selected-model').value;
+            if (!model) {
+                alert("Vui lòng chọn mô hình trước khi dự đoán!");
+                return;
+            }
+        
+            // Gửi form dự đoán
+            document.getElementById('predict-form').submit();
+        }
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Kiểm tra biến active_section từ Flask
+            const activeSection = "{{ active_section|default('home') }}";
+    
+            // Hiển thị phần phù hợp
+            document.querySelectorAll('.section').forEach(function (section) {
+                section.classList.remove('active');
+            });
+    
+            // Kích hoạt phần tương ứng
+            if (activeSection) {
+                document.getElementById(activeSection).classList.add('active');
+            }
+        });
+
+    </script>     
+
+
+</body>
+
+</html>
